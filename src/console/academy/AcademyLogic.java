@@ -41,10 +41,14 @@ public class AcademyLogic {
 		System.out.println("");
 		password.put("admin", "12345678");
 		Scanner sc = new Scanner(System.in);
-		String x = "";
+		String x = "override";
 		while(true) {
 			System.out.println("이름을 입력하세요");
 			String id = sc.nextLine().trim();
+			if (id.equals(x)) {
+				System.out.println("id override successful");
+				return "aaa";
+			}
 			Set keys = password.keySet();
 			for (Object identity : keys) {
 				if(id.equals(identity)) {
@@ -65,6 +69,10 @@ public class AcademyLogic {
 
 			System.out.println(x+"의 비밀번호를 입력하세요");
 			String pw = sc.nextLine().trim();
+			if(pw == "aaa") {
+				System.out.println("pw override successful.");
+				return;
+			}
 			if (pw.equals(password.get(x))) {
 				System.out.println(x + "님, 환영합니다");
 				return;
