@@ -30,9 +30,49 @@ public class AcademyLogic {
 	List<Person> listPerson = new ArrayList<>();
 	Map<Character, List<Person>> memberMap = new HashMap<>();
 	Map<String, String> password = new HashMap<>();
-	
+	String user = "";
 	
 	// [멤버메소드]
+	
+	// 번외: 회원가입 메소드
+	public void register() {
+		Scanner sc = new Scanner(System.in);
+		String idRegister;
+		while(true) {
+			System.out.println("인원의 이름을 입력하세요");
+			idRegister = sc.nextLine().trim();
+			if(common.utility.CommonUtil.isKorean(idRegister)) {}
+			else {
+				System.out.println("주소는 영문/특수문자/오타 없이 입력해주세요.");
+				continue;}
+			if(idRegister.length()<2) {
+				System.out.println("이름은 2자이상입니다.");
+				continue;
+			}
+			if(idRegister.length()>4) {
+				System.out.println("한국 이름은 4자가 최대입니다.");
+				continue;
+			}
+			try {
+				Integer.parseInt(idRegister);
+			} catch (NumberFormatException e) {
+				break;
+			}
+			System.out.println("이름에 숫자는 없어요. ");
+			continue;
+		}
+
+		Set keys = password.keySet();
+		for (Object idMap : keys) {
+			if (idRegister.equals(idMap)) {
+				System.out.println("이미 존재하는 아이디/이름 입니다. 로그인하세요");
+				return;
+			}
+		}
+		System.out.println("새로운 계정을 만드셨네요! 계정에 사용될 비밀번호를 입력하세요.");
+		String pwRegister = sc.nextLine().trim();
+		password.put(idRegister, pwRegister);
+	}//// register()
 	
 	// 0-0] 로그인 메소드
 	public String login(){
@@ -76,6 +116,7 @@ public class AcademyLogic {
 			String pw = sc.nextLine().trim();
 			if (pw.equals(password.get(x))) {
 				System.out.println(x + "님, 환영합니다");
+				user = x;
 				return;
 			} else {
 				System.out.println("비밀번호가 틀렸습니다");
@@ -85,6 +126,7 @@ public class AcademyLogic {
 	}
 	
 	// 0-1] map 불러오는 메소드 
+	@SuppressWarnings("unchecked")
 	private Map<Character, List<Person>> fileToMap() {
 		ObjectInputStream ois = null;
 		try {
@@ -245,6 +287,10 @@ public class AcademyLogic {
 				continue;}
 			if(name.length()<2) {
 				System.out.println("이름은 2자이상입니다.");
+				continue;
+			}
+			if(name.length()>4) {
+				System.out.println("한국 이름은 4자가 최대입니다.");
 				continue;
 			}
 			try {
