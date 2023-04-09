@@ -27,7 +27,6 @@ public class AcademyLogic {
 	}////////// AcademyLogic()
 
 	// [멤버 변수]
-	List<Person> listPerson = new ArrayList<>();
 	Map<Character, List<Person>> memberMap = new HashMap<>();
 	Map<String, String> password = new HashMap<>();
 	String user = "";
@@ -138,15 +137,14 @@ public class AcademyLogic {
 				Set keys = memberMap.keySet();
 				for (Object key : keys) {
 					List<Person> values = memberMap.get(key);
-					for (Person listValues : values) {
-						listPerson.add(listValues);
-					}
+					memberMap.put((Character)key, values);
 					/*for(int i=0; i<listPerson.size(); i++) {
 						listPerson.get(i).print();
 					}*/
 				}
 					
 			}
+			
 		} 
 		catch (FileNotFoundException | ClassNotFoundException e) {
 				System.out.println("파일을 찾는데 오류");
@@ -221,16 +219,16 @@ public class AcademyLogic {
 					break;
 				else if(!(getSubMenu == 1 |getSubMenu ==  2 |getSubMenu == 3 |getSubMenu == 4|getSubMenu==5))
 					continue;
-				int indexEdit = findWithName();
-				editMember(indexEdit, getSubMenu);
+				Person person = findWithName();
+				editMember(person, getSubMenu);
 			}
 			break;
 		case 4: // 삭제
 			Scanner sc = new Scanner(System.in);
 			int i=0;
 			
-				int indexEdit = findWithName();
-				deleteMember(indexEdit);
+				Person person = findWithName();
+				deleteMember(person);
 				/*System.out.println("추가적으로 삭제하시려면 'x' 나 'X'를 누르세요.");
 				String moreDelete = sc.nextLine();
 				if(moreDelete == "x" | moreDelete =="X")
@@ -245,8 +243,7 @@ public class AcademyLogic {
 				break;
 			switch (getSubMenu) {
 			case 1:
-				int foundIndex = findWithName();
-				printFoundName(foundIndex);
+				printFoundName(findPerson(findKey(receiveName()),receiveName()));
 				break;
 			case 2:
 				findWithAddress();
@@ -273,110 +270,22 @@ public class AcademyLogic {
 	// 1] 인원 추가 메소드
 	private void addMembers() throws FileNotFoundException, IOException {
 		Scanner sc = new Scanner(System.in);
-		String name;
-		int age =0;
-		String addr;
-		String cont;
-		
-		while (true) {
-			System.out.println("인원의 이름을 입력하세요");
-			name = sc.nextLine().trim();
-			if(common.utility.CommonUtil.isKorean(name)) {}
-			else {
-				System.out.println("주소는 영문/특수문자/오타 없이 입력해주세요.");
-				continue;}
-			if(name.length()<2) {
-				System.out.println("이름은 2자이상입니다.");
-				continue;
-			}
-			if(name.length()>4) {
-				System.out.println("한국 이름은 4자가 최대입니다.");
-				continue;
-			}
-			try {
-				Integer.parseInt(name);
-			} catch (NumberFormatException e) {
-				break;
-			}
-			System.out.println("이름에 숫자는 없어요. ");
-			continue;
-		} ///// while
-		while (true) {
-			System.out.println(String.format("%s님의 나이를 입력하세요", name));
-			String ageStr = sc.nextLine().trim();
-			if(ageStr.length()>2) {
-				System.out.println("100세미만의 멤버만 사용가능하십니다.");
-				 continue;
-			}
-			boolean isNumber = false;
-			char [] ageCharArr = ageStr.toCharArray();
-			for(int i =0; i<ageCharArr.length; i++) {
-				if(!Character.isDigit(ageCharArr[i])) {
-					System.out.println("나이는 숫자만 넣으세요.");
-					break;
-				}
-				else {
-					age=Integer.parseInt(ageStr);
-					isNumber = true;
-				}
-			}
-			if(isNumber) {
-				break;
-			}
-			else
-				continue;
-		} ///// while
-		
-		while (true) {
-			System.out.println(String.format("%s님의 주소를 (xx동) 입력하세요", name));
-			addr = sc.nextLine().trim();
-			if(common.utility.CommonUtil.isKorean(addr)) {}
-			else {
-				System.out.println("주소는 영문/특수문자/오타 없이 입력해주세요");
-				continue;}
-			char[] addrCharArr = addr.toCharArray();
-
-			if (addrCharArr[addr.length()-1] != '동') {
-				System.out.println("주소는 동으로 입력해주세요.");
-				continue;
-			} 
-			if(addr.length()<2) {
-				System.out.println("동의 정식 명칭을 입력주세요.");
-				continue;
-			}
-			try {
-				Integer.parseInt(addr);
-			} catch (NumberFormatException e) {
-				break;
-			}
-			System.out.println("이름에 숫자는 없어요. ");
-			continue;
-		} ///// while
-		while(true) {
-			System.out.println(String.format("%s님의 전화번호를 (010-xxxx-xxxx) 형식으로 입력하세요", name));
-			cont = sc.nextLine().trim();
-			Pattern pattern = Pattern.compile("010-[0-9]{4}-[0-9]{4}");
-			Matcher matcher = pattern.matcher(cont);
-			if(!matcher.matches()) {
-				System.out.println("전화번호를 형식대로 입력해주세요.");
-				continue;
-			}
-			else break;
-		}
-		Person p = new Person(name, age, addr, cont);
-		listPerson.add(p);
+		String name=common.utility.CommonUtil.inputName();
+		int age = common.utility.CommonUtil.inputAge(name);
+		String addr=common.utility.CommonUtil.inputAddr(name);
+		String cont=common.utility.CommonUtil.inputCont(name);
 
 		char firstChar = CommonUtil.getJaeum(name);
-		List<Person> listPerson = new ArrayList<>();
+		List<Person> listPerson;
 		if (!memberMap.containsKey(firstChar)) {
 			listPerson = new ArrayList<>();
 		} else {
 			listPerson = memberMap.get(firstChar);
 		}
-		Object o = listPerson.add(new Person(name, age, addr, cont));
+		listPerson.add(new Person(name, age, addr, cont));
 		memberMap.put(firstChar, listPerson);
 
-		System.out.println(listPerson.add(p) ? p.name + "님이 추가되었습니다" : p.name + "님이 추가되지 못했습니다");
+		System.out.println(name + "님이 추가되었습니다");
 	}////////// addMembers()
 
 	// 2-1] 출력/보기 서브 메뉴 출력용 메소드
@@ -428,47 +337,49 @@ public class AcademyLogic {
 	}//////// printSubMenu()
 	
 	// 3-2] 멤버를 수정해주는 메소드
-	private void editMember(int index, int subMenuIndex) {
+	private void editMember(Person person, int subMenuIndex) {
 		String revisedTitle = "";
 		String revised="";
 		Scanner sc = new Scanner(System.in);
 		if(subMenuIndex == 1) {
 			System.out.println("새로운 이름을 입력하세요");
 			String newName = sc.nextLine().trim();
-			listPerson.get(index).name = newName;
+			person.name = newName;
 			revisedTitle ="이름";
 			revised=newName;
 		}
 		else if(subMenuIndex == 2) {
 			System.out.println("새로운 나이를 입력하세요");
 			int newAge= Integer.parseInt(sc.nextLine().trim());
-			listPerson.get(index).age = newAge;
+			person.age = newAge;
 			revisedTitle ="나이";
 			revised=String.valueOf(newAge);
 		}
 		else if(subMenuIndex ==3) {
 			System.out.println("새로운 주소를 입력하세요");
 			String newAddr = sc.nextLine().trim();
-			listPerson.get(index).addr = newAddr;
+			person.addr = newAddr;
 			revisedTitle ="주소";
 			revised=newAddr;
 		}
 		else if(subMenuIndex ==4) {
 			System.out.println("새로운 번호를 입력하세요");
 			String newCont = sc.nextLine().trim();
-			listPerson.get(index).cont = newCont;
+			person.cont = newCont;
 			revisedTitle ="번호";
 			revised=newCont;
 		}
 		System.out.println(String.format(
-				"%s 의 %s가/이 %s 로 수정되었습니다",listPerson.get(index).name, revisedTitle, revised));
+				"%s 의 %s가/이 %s 로 수정되었습니다",person.name, revisedTitle, revised));
 		
 	}////////// editMemberName(int index)
 	
 	// 4] 삭제 메소드
-	private void deleteMember(int indexEdit) {
-		String deleteName = listPerson.get(indexEdit).name;
-		listPerson.remove(indexEdit);
+	private void deleteMember(Person person) {
+		String deleteName = person.name;
+		char key = findKey(deleteName);
+		List<Person> list = memberMap.get(key);
+		list.remove(person);
 		System.out.println(String.format("%s 멤버의 정보가 삭제되었습니다", deleteName));
 	}////////////////////deleteMember(int indexEdit)
 	
@@ -477,39 +388,52 @@ public class AcademyLogic {
 	public void printSearchSubMenu() {
 		System.out.println("======================검색 서브 메뉴======================");
 		System.out.println("1.이름으로 검색 2. 주소로 검색 3. 전화번호로 검색 4.메인 메뉴로 이동");
+		System.out.println("팁: 이름으로 검색하는게 가장 빨라요!");
 		System.out.println("=======================================================");
 	}//////// printSearchSubMenu()
 
 	// [5-1] 이름으로 검색하는 메소드
-	private int findWithName() {
-		Scanner sc = new Scanner(System.in);
-		String name;
-		while(true) {
-			System.out.println("찾으시는 멤버의 이름을 입력하세요");
-			name = sc.nextLine().trim();
-			if(common.utility.CommonUtil.isKorean(name)) {
-				break;}
-			else {
-				System.out.println("이 프로그램은 영문 이름을 지원하지 않습니다.");
-				continue;}
-		}
+	public Person findWithName() {
+		String name = receiveName();
+		char jaeum = findKey(name);
+		Person person = findPerson(jaeum, name);
+		return person;
+	}
+	//5-1-1] 이름을 받는 메소드
+	private String receiveName() {
+		String name= common.utility.CommonUtil.inputName();
+		return name;
+	}///////receiveName()
+	
+	//5-1-2] Key를 찾는 메소드
+	private char findKey(String name) {
 		int index = 0;
-		for (Person p : listPerson) {
-			if (p.name.equals(name)) {
-				index = listPerson.indexOf(p);
+		char key = common.utility.CommonUtil.getJaeum(name);
+		List<Person> list = memberMap.get(key);
+		return key;
+	}////////////// findKey()
+	
+	//5-1-3] Person을 찾는 메소드
+	public Person findPerson(char key, String name){
+		List<Person> list = memberMap.get(key);
+		Person personSearched = new Person();
+		for (Person person : list) {
+			if (person.name.equals(name)) {
+				personSearched = person;
+				break;
 			} /// if
 		} //// foreach
-		return index;
-	}////////////// findWithName()
+		return personSearched;
+	}//////findName()
 	
-	//5-1-1] 검색된 결과를 출력하는 메소드
-	private void printFoundName(int index) {
-		System.out.println(String.format("[%s 멤버 정보]", listPerson.get(index).name));
-		listPerson.get(index).print();
+	//5-1-4] 이름으로 검색된 멤버를 출력하는 메소드
+	private void printFoundName(Person person) {
+		System.out.println(String.format("[%s 멤버 정보]", person.name));
+		person.print();
 	}
 
 	// [5-2] 나이로 검색하는 메소드 //나이대로 검색 가능하게.
-	private void findWithAge() {
+	/*private void findWithAge() {
 		Scanner sc = new Scanner(System.in);
 		System.out.println("어떤 나이로 검색하시겠습니까?");
 		int age2 = Integer.parseInt(sc.nextLine().trim());
@@ -519,7 +443,7 @@ public class AcademyLogic {
 				p.print();
 			} /// if
 		} //// foreach
-	}//////// findWithSubject()
+	}//////// findWithSubject()*/
 
 	// [5-3] 주소로 검색하는 메소드
 	private void findWithAddress() {
@@ -527,7 +451,10 @@ public class AcademyLogic {
 		System.out.println("어떤 학번으로 검색하시겠습니까?");
 		String address = sc.nextLine().trim();
 		System.out.println(String.format("[%s 에 사는 인원들]", address));
-		for (Person p : listPerson) {
+		Set keys = memberMap.keySet();
+		for (Object key : keys) {
+			List<Person> list = memberMap.get(key);
+			for(Person p : list)
 			if (p.addr.equals(address)) {
 				p.print();
 			} /// if
@@ -540,8 +467,11 @@ public class AcademyLogic {
 		System.out.println("검색하실 번호를 숫자로만 입력하세요");
 		String contact = sc.nextLine().trim();
 		System.out.println(String.format("[%s 의 전화번호를 가진 인원들]", contact));
-		for (Person p : listPerson) {
-			if (p.cont.equals(contact)) {
+		Set keys = memberMap.keySet();
+		for (Object key : keys) {
+			List<Person> list = memberMap.get(key);
+			for(Person p : list)
+			if (p.addr.equals(contact)) {
 				p.print();
 			} /// if
 		} //// foreach
@@ -549,7 +479,7 @@ public class AcademyLogic {
 
 	//6] 파일 저장 메소드.
 	private void saveData() throws IOException {
-		if(listPerson.isEmpty()) {
+		if(memberMap.isEmpty()) {
 			System.out.println("저장하실 데이터가 없습니다.");
 			return;
 		}

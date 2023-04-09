@@ -3,8 +3,12 @@ package common.utility;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javax.xml.stream.events.StartDocument;
+import console.academy.Person;
 
 public class CommonUtil {
 	//[문자열이 숫자 형식이면 true, 아니면 false 반환]
@@ -95,5 +99,105 @@ public class CommonUtil {
 				return false;}
 		return true;
 	}////////////isKorean()
+	
+	public static String inputName() {
+		Scanner sc = new Scanner(System.in);
+		String name;
+		while (true) {
+			System.out.println("멤버의 이름을 입력하세요");
+			name = sc.nextLine().trim();
+			if(common.utility.CommonUtil.isKorean(name)) {}
+			else {
+				System.out.println("주소는 영문/특수문자/오타 없이 입력해주세요.");
+				continue;}
+			if(name.length()<2) {
+				System.out.println("이름은 2자이상입니다.");
+				continue;
+			}
+			if(name.length()>4) {
+				System.out.println("한국 이름은 4자가 최대입니다.");
+				continue;
+			}
+			try {
+				Integer.parseInt(name);
+			} catch (NumberFormatException e) {
+				break;
+			}
+			System.out.println("이름에 숫자는 없어요. ");
+			continue;
+		} ///// while
+		return name;
+	}//////////inputName()
 
+	public static int inputAge(String name) {
+		Scanner sc = new Scanner(System.in);
+		while (true) {
+			System.out.println(String.format("%s님의 나이를 입력하세요", name));
+			String ageStr = sc.nextLine().trim();
+			if(ageStr.length()>2) {
+				System.out.println("100세미만의 멤버만 사용가능하십니다.");
+				 continue;
+			}
+			boolean isNumber = false;
+			char [] ageCharArr = ageStr.toCharArray();
+			for(int i =0; i<ageCharArr.length; i++) {
+				if(!Character.isDigit(ageCharArr[i])) {
+					System.out.println("나이는 숫자만 넣으세요.");
+					break;
+				}
+				else {
+					return Integer.parseInt(ageStr);
+					
+				}
+			}
+			continue;
+		} ///// while
+	}/////////inputAge(String name)
+	public static String inputAddr(String name) {
+		Scanner sc = new Scanner(System.in);
+		String addr;
+		while (true) {
+			System.out.println(String.format("%s님의 주소를 (xx동) 입력하세요", name));
+			addr = sc.nextLine().trim();
+			if(common.utility.CommonUtil.isKorean(addr)) {}
+			else {
+				System.out.println("주소는 영문/특수문자/오타 없이 입력해주세요");
+				continue;}
+			char[] addrCharArr = addr.toCharArray();
+
+			if (addrCharArr[addr.length()-1] != '동') {
+				System.out.println("주소는 동으로 입력해주세요.");
+				continue;
+			} 
+			if(addr.length()<2) {
+				System.out.println("동의 정식 명칭을 입력주세요.");
+				continue;
+			}
+			try {
+				Integer.parseInt(addr);
+			} catch (NumberFormatException e) {
+				break;
+			}
+			System.out.println("주소에 숫자는 없어요. ");
+			continue;
+		} ///// while
+		return addr;
+	}////////////inputAddr(String name)
+	public static String inputCont(String name) {
+		Scanner sc = new Scanner(System.in);
+		String cont;
+		while(true) {
+			System.out.println(String.format("%s님의 전화번호를 (010-xxxx-xxxx) 형식으로 입력하세요", name));
+			cont = sc.nextLine().trim();
+			Pattern pattern = Pattern.compile("010-[0-9]{4}-[0-9]{4}");
+			Matcher matcher = pattern.matcher(cont);
+			if(!matcher.matches()) {
+				System.out.println("전화번호를 형식대로 입력해주세요.");
+				continue;
+			}
+			else break;
+		}
+		return cont;
+	}/////////////inputAge(String name)
+	
 }///////class
