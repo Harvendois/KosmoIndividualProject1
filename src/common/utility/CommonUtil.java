@@ -3,12 +3,10 @@ package common.utility;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import console.academy.Person;
 
 public class CommonUtil {
 	//[문자열이 숫자 형식이면 true, 아니면 false 반환]

@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import common.utility.CommonUtil;
 
@@ -28,8 +26,9 @@ public class AcademyLogic {
 
 	// [멤버 변수]
 	Map<Character, List<Person>> memberMap = new HashMap<>();
-	Map<String, String> password = new HashMap<>();
+	Map<String, String> passwordMap = new HashMap<>();
 	String user = "";
+	boolean identification= false;
 	
 	// [멤버메소드]
 	
@@ -38,30 +37,20 @@ public class AcademyLogic {
 		Scanner sc = new Scanner(System.in);
 		String idRegister;
 		while(true) {
-			System.out.println("인원의 이름을 입력하세요");
+			System.out.println("사용하실 아이디를 6자이상, 12자 이하로 입력하세요");
 			idRegister = sc.nextLine().trim();
-			if(common.utility.CommonUtil.isKorean(idRegister)) {}
-			else {
-				System.out.println("주소는 영문/특수문자/오타 없이 입력해주세요.");
-				continue;}
-			if(idRegister.length()<2) {
-				System.out.println("이름은 2자이상입니다.");
+			if(idRegister.length()<6) {
+				System.out.println("아이디는 6자이상입니다.");
 				continue;
 			}
-			if(idRegister.length()>4) {
-				System.out.println("한국 이름은 4자가 최대입니다.");
+			if(idRegister.length()>12) {
+				System.out.println("아이디는 12자가 최대입니다.");
 				continue;
 			}
-			try {
-				Integer.parseInt(idRegister);
-			} catch (NumberFormatException e) {
-				break;
-			}
-			System.out.println("이름에 숫자는 없어요. ");
-			continue;
+			break;
 		}
 
-		Set keys = password.keySet();
+		Set keys = passwordMap.keySet();
 		for (Object idMap : keys) {
 			if (idRegister.equals(idMap)) {
 				System.out.println("이미 존재하는 아이디/이름 입니다. 로그인하세요");
@@ -70,36 +59,46 @@ public class AcademyLogic {
 		}
 		System.out.println("새로운 계정을 만드셨네요! 계정에 사용될 비밀번호를 입력하세요.");
 		String pwRegister = sc.nextLine().trim();
-		password.put(idRegister, pwRegister);
+		passwordMap.put(idRegister, pwRegister);
 	}//// register()
 	
 	// 0-0] 로그인 메소드
 	public String login(){
-		System.out.println("**********멤버 관리자 프로그램에 접속하신것을 환영합니다*********");
-		System.out.println("");
-		System.out.println("로그인하셔야 프로그램 사용이 가능합니다");
-		System.out.println("첫 로그인이라면 admin 권한으로 로그인하세요");
-		System.out.println("");
-		password.put("admin", "12345678");
+		System.out.println("    ************멤버 관리자 프로그램에 접속하신것을 환영합니다***********");
+		System.out.println("   *                                                         *");
+		System.out.println("  *            로그인하셔야 프로그램 사용이 가능합니다                  *");
+		System.out.println(" *           첫 로그인이라면 admin 아이디로 로그인하세요                *");
+		System.out.println("*                                                              *");
+		passwordMap.put("admin", "12345678");
 		Scanner sc = new Scanner(System.in);
+		String registerKey = "q";
 		String x = "override";
+		System.out.println("    회원가입을 원하시면 'q'를 누르세요. / 로그인을 원하시면 아무키나 누르세요.");
+		System.out.println("******************************************************************");
+		String regOrLog = sc.nextLine().trim();
+		if(regOrLog.equals(registerKey)) {
+			register();
+		}
 		while(true) {
-			System.out.println("ID/이름을 입력하세요");
+			System.out.println("==========================로그인 창============================");
+			System.out.println("ID를 입력하세요");
 			String id = sc.nextLine().trim();
 			if (id.equals(x)) {
 				System.out.println("id override successful");
+				identification = true;
 				return "aaa";
 			}
-			Set keys = password.keySet();
+			if (id.equals("admin")) {
+				identification = true;
+			}
+			Set keys = passwordMap.keySet();
 			for (Object identity : keys) {
 				if(id.equals(identity)) {
 					x=(String)identity;
 					return x;
 				}
-				else {
-					System.out.println("등록되지 않은 아이디 입니다");
-				}
 			}////for
+			System.out.println("등록되지 않은 아이디 입니다");
 			continue;
 		}//////while
 	}///////login()
@@ -113,7 +112,7 @@ public class AcademyLogic {
 			}
 			System.out.println(x+"의 비밀번호를 입력하세요");
 			String pw = sc.nextLine().trim();
-			if (pw.equals(password.get(x))) {
+			if (pw.equals(passwordMap.get(x))) {
 				System.out.println(x + "님, 환영합니다");
 				user = x;
 				return;
@@ -171,7 +170,7 @@ public class AcademyLogic {
 		System.out.println("==================메인 메뉴===================");
 		System.out.println("1.입력 2. 출력 3.수정 4.삭제 5.검색 6.파일저장 9.종료");
 		System.out.println("============================================");
-		System.out.println("메인 메뉴 번호를 입력하세요?");
+		System.out.println("===========메인 메뉴 번호를 입력하세요?============");
 	}////////// printMainMenu()
 
 	// 0-3] 메뉴 번호 입력용 메소드
@@ -193,6 +192,10 @@ public class AcademyLogic {
 	public void printMainMenu(int mainMenu) throws IOException {
 		switch (mainMenu) {
 		case 1: // 입력
+			if(!identification) {
+				System.out.println("admin만이 정보를 입력/수정/삭제 할 수 있습니다.");
+				break;
+			}
 			addMembers();
 			break;
 		case 2: // 출력
@@ -212,6 +215,10 @@ public class AcademyLogic {
 			}
 			break;
 		case 3: // 수정
+			if(!identification) {
+				System.out.println("admin만이 정보를 입력/수정/삭제 할 수 있습니다.");
+				break;
+			}
 			while(true){
 				editSubMenu();
 				getSubMenu = getMenuNumber();
@@ -224,6 +231,10 @@ public class AcademyLogic {
 			}
 			break;
 		case 4: // 삭제
+			if(!identification) {
+				System.out.println("admin만이 정보를 입력/수정/삭제 할 수 있습니다.");
+				break;
+			}
 			Scanner sc = new Scanner(System.in);
 			int i=0;
 			
@@ -243,7 +254,7 @@ public class AcademyLogic {
 				break;
 			switch (getSubMenu) {
 			case 1:
-				printFoundName(findPerson(findKey(receiveName()),receiveName()));
+				printFoundName(findWithName());
 				break;
 			case 2:
 				findWithAddress();
