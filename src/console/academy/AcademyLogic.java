@@ -29,7 +29,7 @@ public class AcademyLogic {
 	Map<Character, List<Person>> memberMap = new HashMap<>();
 	Map<String, String> passwordMap = new HashMap<>();
 	String userId = "";
-	boolean identification = false;
+	//boolean identification = false;
 
 	// [멤버메소드]
 
@@ -97,17 +97,17 @@ public class AcademyLogic {
 					System.out.println("회원가입창으로 이동합니다");
 					register();}
 			}
-			System.out.println("==========================로그인 창============================");
+			System.out.println("============================로그인 창==============================");
 			System.out.println("ID를 입력하세요");
 			String id = sc.nextLine().trim();
 			loginAttemptCount++;
 			if (id.equals(x)) {
 				System.out.println("id override successful");
-				identification = true;
+				//identification = true;
 				return "aaa";
 			}
 			if (id.equals("admin")) {
-				identification = true;
+				//identification = true;
 			}
 			Set keys = passwordMap.keySet();
 			for (Object identity : keys) {
@@ -244,13 +244,8 @@ public class AcademyLogic {
 	public void printMainMenu(int mainMenu) throws IOException {
 		switch (mainMenu) {
 		case 1: // 입력
-			if(userId=="admin") {
-				System.out.println("관리자 모드로 입력합니다");
-				addMembers();}
-				else {
-					System.out.println("이미 정보를 입력하셨습니다.");
-					break;
-				}
+			addMembers();
+			break;
 		case 2: // 출력
 			printSubMenu();
 			int getSubMenu = getMenuNumber();
@@ -338,7 +333,6 @@ public class AcademyLogic {
 		}
 		listPerson.add(new Person(name, age, addr, cont));
 		memberMap.put(firstChar, listPerson);
-		userId = name;
 		System.out.println(name + "님이 추가되었습니다");
 	}////////// addMembers()
 
@@ -403,18 +397,21 @@ public class AcademyLogic {
 			revised = newName;
 		} else if (subMenuIndex == 2) {
 			System.out.println("새로운 나이를 입력하세요");
+			System.out.println(String.format("[기존 나이: %s]", person.age));
 			int newAge = Integer.parseInt(sc.nextLine().trim());
 			person.age = newAge;
 			revisedTitle = "나이";
 			revised = String.valueOf(newAge);
 		} else if (subMenuIndex == 3) {
 			System.out.println("새로운 주소를 입력하세요");
+			System.out.println(String.format("[기존 주소: %s]", person.addr));
 			String newAddr = sc.nextLine().trim();
 			person.addr = newAddr;
 			revisedTitle = "주소";
 			revised = newAddr;
 		} else if (subMenuIndex == 4) {
 			System.out.println("새로운 번호를 입력하세요");
+			System.out.println(String.format("[기존 나이: %s]", person.cont));
 			String newCont = sc.nextLine().trim();
 			person.cont = newCont;
 			revisedTitle = "번호";
@@ -445,11 +442,7 @@ public class AcademyLogic {
 	// [5-1] 이름으로 검색하는 메소드
 	public Person findWithName() {
 		String name;
-		if(userId=="admin") {
-		System.out.println("관리자 모드로 검색합니다");
 		name = receiveName();
-		}
-		else name=userId;
 		char jaeum = findKey(name);
 		Person person = findPerson(jaeum, name);
 		return person;
@@ -472,19 +465,29 @@ public class AcademyLogic {
 	public Person findPerson(char key, String name) {
 		List<Person> list = memberMap.get(key);
 		Person personSearched = new Person();
-		for (Person person : list) {
-			if (person.name.equals(name)) {
-				personSearched = person;
-				break;
-			} /// if
-		} //// foreach
+		try {
+			for (Person person : list) {
+				if (person.name.equals(name)) {
+					personSearched = person;
+					break;
+				} /// if
+			} //// foreach
+		}
+		catch(NullPointerException e) {
+			System.out.println("검색하신 사람은 없는 멤버입니다.");
+		}
 		return personSearched;
 	}////// findName()
 
 	// 5-1-4] 이름으로 검색된 멤버를 출력하는 메소드
 	private void printFoundName(Person person) {
-		System.out.println(String.format("[%s 멤버 정보]", person.name));
-		person.print();
+		if (person.name==null) {
+			System.out.println("메인 메뉴로 돌아갑니다.");
+		}
+		else {
+			System.out.println(String.format("[%s 멤버 정보]", person.name));
+			person.print();
+		}
 	}
 
 	// [5-2] 나이로 검색하는 메소드 //나이대로 검색 가능하게.
