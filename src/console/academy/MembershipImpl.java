@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,8 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import common.utility.CommonUtil;
 
 public class MembershipImpl implements Membership {
 
@@ -27,9 +30,18 @@ public class MembershipImpl implements Membership {
 	boolean isMember() {
 		return identification;
 	}
-	String username() {
-		return userId;
-	}
+	String findUsernameWithId() {
+		String username="";
+		Set keys = memberMap.keySet();
+		for (Object key : keys) {
+			List<Member> list = memberMap.get(key);
+			for (Member m : list)
+				if (m.id.equals(userId)) {
+					username=m.name;
+				} /// if
+		} //// foreach
+		return username;
+	}//////////////
 	
 	// 추상 메소드 오버라이드
 	@Override
@@ -59,6 +71,7 @@ public class MembershipImpl implements Membership {
 			}
 		}
 			System.out.println("프로그램을 종료합니다.");
+			System.out.println(String.format("%s님, 안녕히가세요.", findUsernameWithId()));
 			System.exit(0);
 		}/////if
 		return input;
@@ -161,6 +174,7 @@ public class MembershipImpl implements Membership {
 			}
 		}
 		System.out.println("새로운 계정을 만드셨네요! 계정에 사용될 비밀번호를 입력하세요.");
+		userId = idRegister;
 		String pwRegister = getValue("비밀번호");
 		passwordMap.put(idRegister, pwRegister);
 		try {
@@ -168,6 +182,9 @@ public class MembershipImpl implements Membership {
 		} catch (IOException e) {
 			System.out.println("저장 오류");
 		}
+		System.out.println("멤버님에 대해서 알려주세요.");
+		addMembers(userId);
+		
 	}//// register()
 
 	@Override
@@ -181,7 +198,7 @@ public class MembershipImpl implements Membership {
 			String pw = getValue("비밀번호");
 			if (pw.equals(passwordMap.get(x))) {
 				System.out.println(x + "님, 환영합니다");
-				userId = x;
+				userId= x;
 				return;
 			} else {
 				System.out.println("비밀번호가 틀렸습니다");
@@ -190,6 +207,28 @@ public class MembershipImpl implements Membership {
 		}
 	}
 
+	// 1] 인원 추가 메소드
+		protected void addMembers(String userId) throws FileNotFoundException, IOException {
+			Scanner sc = new Scanner(System.in);
+			String name = inputName();
+			int age = inputAge(name);
+			String addr = inputAddr(name);
+			String cont = inputCont(name);
+			
+			String id = userId;
+
+			char firstChar = CommonUtil.getJaeum(name);
+			List<Member> listMember;
+			if (!memberMap.containsKey(firstChar)) {
+				listMember = new ArrayList<>();
+			} else {
+				listMember = memberMap.get(firstChar);
+			}
+			listMember.add(new Member(id, name, age, addr, cont));
+			memberMap.put(firstChar, listMember);
+			System.out.println(name + "님이 추가되었습니다");
+		}////////// addMembers()
+	
 	@Override
 	public Map<Character, List<Member>> fileToMap() {
 		ObjectInputStream ois = null;
@@ -352,7 +391,7 @@ public class MembershipImpl implements Membership {
 		Scanner sc = new Scanner(System.in);
 		String cont;
 		while(true) {
-			cont = getValue(String.format("%s님의 전화번호",name));
+			cont = getValue(String.format("%s님의 전화번호 (010-xxxx-xxxx)",name));
 			Pattern pattern = Pattern.compile("010-[0-9]{4}-[0-9]{4}");
 			Matcher matcher = pattern.matcher(cont);
 			if(!matcher.matches()) {

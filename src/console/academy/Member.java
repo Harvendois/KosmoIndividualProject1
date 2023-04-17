@@ -8,15 +8,18 @@ public class Member implements Comparable<Member>, Serializable{
 	public int age;
 	public String addr;
 	public String cont; 
+	public String id;
 	//[기본 생성자]
 	public Member() {}
 	//[인자 생성자]
-	public Member(String name, int age) {		
+	public Member(String id, String name, int age) {		
+		this.id = id;
 		this.name = name;
 		this.age = age;
 	}/////////////////
 	
-	public Member(String name, int age, String address, String contact) {
+	public Member(String id, String name, int age, String address, String contact) {
+		this.id = id;
 		this.name = name;
 		this.age = age;
 		this.addr = address;
@@ -24,7 +27,7 @@ public class Member implements Comparable<Member>, Serializable{
 	}
 	//[멤버 메소드]
 	String get() {
-		return String.format("이름:%s,나이:%s,연락처:%s,주소:%s",name,age,cont,addr);
+		return String.format("아이디:%s 이름:%s,나이:%s,연락처:%s,주소:%s",id, name,age,cont,addr);
 	}
 	void print() {
 		System.out.println(get());

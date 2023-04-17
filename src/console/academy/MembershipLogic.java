@@ -58,7 +58,7 @@ public class MembershipLogic extends MembershipImpl{
 		switch (mainMenu) {
 		case 1: // 입력
 			if(isMember()) {
-			addMembers();
+			addMembers("");
 			}
 			else {
 				System.out.println("멤버 정보 보호를 위해 admin만이 입력/수정/삭제 할 수 있습니다.");
@@ -137,26 +137,6 @@ public class MembershipLogic extends MembershipImpl{
 			System.out.println("메뉴에 없는 번호입니다");
 		}//// switch
 	}///////// separateMainMenu(int mainMenu)
-
-	// 1] 인원 추가 메소드
-	private void addMembers() throws FileNotFoundException, IOException {
-		Scanner sc = new Scanner(System.in);
-		String name = inputName();
-		int age = inputAge(name);
-		String addr = inputAddr(name);
-		String cont = inputCont(name);
-
-		char firstChar = CommonUtil.getJaeum(name);
-		List<Member> listMember;
-		if (!memberMap.containsKey(firstChar)) {
-			listMember = new ArrayList<>();
-		} else {
-			listMember = memberMap.get(firstChar);
-		}
-		listMember.add(new Member(name, age, addr, cont));
-		memberMap.put(firstChar, listMember);
-		System.out.println(name + "님이 추가되었습니다");
-	}////////// addMembers()
 
 	// 2-1] 출력/보기 서브 메뉴 출력용 메소드
 	public void printSubMenu() {
@@ -268,7 +248,7 @@ public class MembershipLogic extends MembershipImpl{
 
 	// 5-1-1] 이름을 받는 메소드
 	private String receiveName() {
-		String name = common.utility.CommonUtil.inputName();
+		String name = inputName();
 		return name;
 	}/////// receiveName()
 
@@ -352,7 +332,7 @@ public class MembershipLogic extends MembershipImpl{
 	// 9] 종료 메소드
 	private void end() {
 		System.out.println("프로그램을 종료 합니다");
-		System.out.println(String.format("%s님, 안녕히가세요.", username()));
+		System.out.println(String.format("%s님, 안녕히가세요.", findUsernameWithId()));
 		System.exit(0); // 정상적인 종료라고 0을 줌.
 	}
 
