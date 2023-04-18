@@ -74,6 +74,9 @@ public class MembershipImpl implements Membership {
 			System.out.println(String.format("%s님, 안녕히가세요.", findUsernameWithId()));
 			System.exit(0);
 		}/////if
+		else if(input.equalsIgnoreCase("main")) {
+			//to be created
+		}
 		return input;
 	}
 
@@ -126,8 +129,7 @@ public class MembershipImpl implements Membership {
 					register();}
 			}
 			System.out.println("============================로그인 창==============================");
-			System.out.println("ID를 입력하세요");
-			String id = getValue("아이디");
+			String id = getValue("ID");
 			loginAttemptCount++;
 			if (id.equals(x)) {
 				System.out.println("id override successful");
@@ -184,6 +186,7 @@ public class MembershipImpl implements Membership {
 		}
 		System.out.println("멤버님에 대해서 알려주세요.");
 		addMembers(userId);
+		saveData();
 		
 	}//// register()
 
@@ -192,13 +195,13 @@ public class MembershipImpl implements Membership {
 		while (true) {
 			if (x == "aaa") {
 				System.out.println("pw override successful.");
+				userId = "admin";
 				return;
 			}
-			System.out.println(x + "의 비밀번호를 입력하세요");
-			String pw = getValue("비밀번호");
+			String pw = getValue(x+"의 비밀번호");
 			if (pw.equals(passwordMap.get(x))) {
-				System.out.println(x + "님, 환영합니다");
 				userId= x;
+				System.out.println(findUsernameWithId() + "님, 환영합니다");
 				return;
 			} else {
 				System.out.println("비밀번호가 틀렸습니다");
@@ -207,7 +210,7 @@ public class MembershipImpl implements Membership {
 		}
 	}
 
-	// 1] 인원 추가 메소드
+	// 인원 추가 메소드
 		protected void addMembers(String userId) throws FileNotFoundException, IOException {
 			Scanner sc = new Scanner(System.in);
 			String name = inputName();
