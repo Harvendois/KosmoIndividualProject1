@@ -239,8 +239,13 @@ public class MembershipLogic extends MembershipImpl{
 			}
 			listMember.add(new Member(member.id, newName, member.age, member.addr, member.cont));
 			memberMap.put(firstChar, listMember);
+			List<Member> oldMemberList;
 			char deleteChar = CommonUtil.getJaeum(member.name);
-			memberMap.remove(deleteChar);
+			oldMemberList = memberMap.get(deleteChar);
+			oldMemberList.remove(member);
+			if(oldMemberList.isEmpty()) {
+				memberMap.remove(deleteChar);
+			}
 			revisedTitle = "이름";
 			revised = newName;
 			
