@@ -35,10 +35,11 @@ public class MembershipImpl implements Membership {
 		Set keys = memberMap.keySet();
 		for (Object key : keys) {
 			List<Member> list = memberMap.get(key);
-			for (Member m : list)
+			for (Member m : list) {
 				if (m.id.equals(userId)) {
 					username=m.name;
 				} /// if
+			}
 		} //// foreach
 		return username;
 	}//////////////
@@ -55,7 +56,6 @@ public class MembershipImpl implements Membership {
 			if(finalCheck.equals("save")) {
 				try {
 					saveData();
-					System.out.println("저장되었습니다.");
 					break;
 				} catch (IOException e) {
 					System.out.println("저장 오류");
@@ -74,9 +74,9 @@ public class MembershipImpl implements Membership {
 			System.out.println(String.format("%s님, 안녕히가세요.", findUsernameWithId()));
 			System.exit(0);
 		}/////if
-		else if(input.equalsIgnoreCase("main")) {
-			//to be created
+		/*else if(input.equalsIgnoreCase("main")) {
 		}
+		*/
 		return input;
 	}
 

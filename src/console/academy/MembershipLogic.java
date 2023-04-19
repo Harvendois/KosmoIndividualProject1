@@ -33,10 +33,10 @@ public class MembershipLogic extends MembershipImpl{
 	// 0-1] 메뉴 출력용 메소드
 
 	public void printMainMenu() {
-		System.out.println("==================메인 메뉴===================");
-		System.out.println("1.입력 2. 출력 3.수정 4.삭제 5.검색 6.파일저장 9.종료");
-		System.out.println("============================================");
-		System.out.println("===========메인 메뉴 번호를 입력하세요?============");
+		System.out.println("===================================메인 메뉴==================================");
+		System.out.println("1.입력 2. 출력 3.수정 4.삭제 5.검색 6.파일저장 7.ID/PW 출력 8.현재 사용되는 Id 조회 9.종료");
+		System.out.println("============================================================================");
+		System.out.println("=============================메인 메뉴 번호를 입력하세요?==========================");
 	}////////// printMainMenu()
 
 	// 0-2] 메뉴 번호 입력용 메소드
@@ -94,7 +94,6 @@ public class MembershipLogic extends MembershipImpl{
 				}///while
 			} ////if
 			else {
-				Member user;
 				Set keys = memberMap.keySet();
 				for (Object key : keys) {
 					List<Member> values = memberMap.get(key);
@@ -110,10 +109,10 @@ public class MembershipLogic extends MembershipImpl{
 									continue;
 								editMember(member, getSubMenu);
 							}
-							break;
+							
 						}
 					}
-					break;
+					
 				}
 			}
 			break;
@@ -151,6 +150,20 @@ public class MembershipLogic extends MembershipImpl{
 			break;
 		case 6: // 파일저장
 			saveData();
+			break;
+		case 7: 
+			if(isMember()) {
+				System.out.println("[ID와 PW들입니다.]");
+				Set keys = passwordMap.keySet();
+				for (Object key : keys) {
+					String value = passwordMap.get(key);
+					System.out.println(String.format("%s : %s", key,value ));
+				}
+			}
+			else System.out.println("멤버 정보 보호를 위해 admin만이 입력/수정/삭제 할 수 있습니다.");
+			break;
+		case 8: // 현재 아이디 확인
+			System.out.println("currently active ID is:"+userId);
 			break;
 		case 9: // 종료
 			end();
@@ -226,8 +239,10 @@ public class MembershipLogic extends MembershipImpl{
 			}
 			listMember.add(new Member(member.id, newName, member.age, member.addr, member.cont));
 			memberMap.put(firstChar, listMember);
-			deleteMember(member);
-			revisedTitle = newName;
+			char deleteChar = CommonUtil.getJaeum(member.name);
+			memberMap.remove(deleteChar);
+			revisedTitle = "이름";
+			revised = newName;
 			
 		} else if (subMenuIndex == 2) {
 			System.out.println(String.format("[기존 나이: %s]", member.age));
@@ -248,7 +263,7 @@ public class MembershipLogic extends MembershipImpl{
 			revisedTitle = "번호";
 			revised = newCont;
 		}
-		System.out.println(String.format("%s 의 %s가/이 %s 로 수정되었습니다", member.name, revisedTitle, revised));
+		System.out.println(String.format("%s 님의 %s가/이 %s 로 수정되었습니다", member.name, revisedTitle, revised));
 
 	}////////// editMemberName(int index)
 
