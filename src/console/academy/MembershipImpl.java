@@ -1,13 +1,18 @@
 package console.academy;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -36,9 +41,19 @@ public class MembershipImpl implements Membership {
 		for (Object key : keys) {
 			List<Member> list = memberMap.get(key);
 			for (Member m : list) {
-				if (m.id.equals(userId)) {
-					username=m.name;
-				} /// if
+				try {
+					if (m.id.equals(userId)) {
+						username=m.name;
+					} /// if
+				}
+				catch (NullPointerException e){
+					
+				}
+				finally {
+					if(m.id==null) {
+						continue;
+					}
+				}
 			}
 		} //// foreach
 		return username;
@@ -50,29 +65,7 @@ public class MembershipImpl implements Membership {
 		System.out.println(String.format("%s을(를) 입력하세요", title));
 		String input = sc.nextLine().trim();
 		if(input.equalsIgnoreCase("exit")) {
-		while(true){
-			System.out.println("잠깐, 지금까지 입력/수정/삭제하신 작업들을 저장하시려면 save, 아니라면 no를 입력해주세요");
-			String finalCheck = sc.nextLine().trim();
-			if(finalCheck.equals("save")) {
-				try {
-					saveData();
-					break;
-				} catch (IOException e) {
-					System.out.println("저장 오류");
-				}	
-			}
-			else if(finalCheck.equals("no")) {
-				System.out.println("저장하지 않습니다.");
-				break;
-			}
-			else {
-				System.out.println("잘못 입력하셨습니다.");
-				continue;
-			}
-		}
-			System.out.println("프로그램을 종료합니다.");
-			System.out.println(String.format("%s님, 안녕히가세요.", findUsernameWithId()));
-			System.exit(0);
+			end();
 		}/////if
 		/*else if(input.equalsIgnoreCase("main")) {
 		}
@@ -201,7 +194,7 @@ public class MembershipImpl implements Membership {
 			String pw = getValue(x+"의 비밀번호");
 			if (pw.equals(passwordMap.get(x))) {
 				userId= x;
-				System.out.println(findUsernameWithId() + "님, 환영합니다");
+				
 				return;
 			} else {
 				System.out.println("비밀번호가 틀렸습니다");
@@ -427,4 +420,122 @@ public class MembershipImpl implements Membership {
 		}
 	}//// saveIdPassword()
 
+	public void fileToMembers() {
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new InputStreamReader(new FileInputStream
+					("E:\\CJH\\Workspace\\Java\\ChoJungHaProject1\\src\\console\\academy\\"+getValue("파일이름.확장명")), "UTF-8"));
+			System.out.println("스트림이 연결되었습니다.");
+			String line;
+			int i =0;
+			while((line = br.readLine())!=null) {
+				String[] values = line.split(",");
+				String name = values[0];
+				int age = Integer.parseInt(values[1]);
+				String address = values[2];
+	            String contact = values[3];
+	            Member newMember = new Member(null,name, age, address, contact);
+	            char key = common.utility.CommonUtil.getJaeum(name);
+	            Set keys = memberMap.keySet();
+	            if (keys.contains(key)) {
+	            	List<Member> existentMemberList = memberMap.get(key);
+		            existentMemberList.add(newMember);
+		            memberMap.put(key, existentMemberList);
+	            }
+	            else {
+		            List<Member> newMemberList =  new ArrayList<Member>();
+		            newMemberList.add(newMember);
+	            	memberMap.put(key, newMemberList);
+	            }
+	            i++;
+			}
+			System.out.println(String.format("성공적으로 %d명의 멤버가 추가되었습니다.", i));
+		} catch (FileNotFoundException e) {
+			System.out.println("파일을 찾는데 오류: "+e.getMessage());
+			
+		} catch (IOException e) {
+			System.out.println("파일을 불러오는데 오류: "+e.getMessage());
+			
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+				System.out.println("성공적으로 스트림을 닫았습니다");
+				return; //여기 수정 필요
+			} catch (IOException e) {
+				System.out.println("파일 닫기시 오류");
+			}
+		}
+		return; 
+	}//////////// fileToMembers
+	
+	public void membersToFile() {
+		PrintWriter pw = null;
+		try {
+			pw = new PrintWriter(new FileWriter(
+					"E:\\CJH\\Workspace\\Java\\ChoJungHaProject1\\src\\console\\academy\\exported_members.csv"));
+
+			System.out.println("스트림이 연결되었습니다.");
+			int i = 0;
+			Set keys = memberMap.keySet();
+			Iterator<Character> iterator = keys.iterator();
+			while (iterator.hasNext()) {
+				char key = iterator.next();
+				List<Member> value = memberMap.get(key);
+				for (Member m : value) {
+					String name = m.name;
+					int age = m.age;
+					String addr = m.addr;
+					String cont = m.cont;
+					pw.println(name + "," + age + "," + addr + "," + cont);
+					i++;
+				}
+			}
+
+			System.out.println(String.format("성공적으로 %d명의 멤버가 출력되었습니다.", i));
+		}
+			
+		
+		catch (FileNotFoundException e) {
+			System.out.println("파일을 찾는데 오류: "+e.getMessage());
+		} 
+		catch (IOException e) {
+			System.out.println("파일을 불러오는데 오류: "+e.getMessage());
+		} 
+		finally {
+			if (pw != null)
+				pw.close();
+			System.out.println("성공적으로 스트림을 닫았습니다");
+			return; //여기 수정 필요
+		}
+	}//////////// fileToMembers
+	
+	
+	// 9] 종료 메소드
+		protected void end() {
+			while(true){
+				System.out.println("잠깐, 지금까지 입력/수정/삭제하신 작업들을 저장하시려면 save, 아니라면 no를 입력해주세요");
+				String finalCheck = sc.nextLine().trim();
+				if(finalCheck.equals("save")) {
+					try {
+						saveData();
+						break;
+					} catch (IOException e) {
+						System.out.println("저장 오류");
+					}	
+				}
+				else if(finalCheck.equals("no")) {
+					System.out.println("저장하지 않습니다.");
+					break;
+				}
+				else {
+					System.out.println("잘못 입력하셨습니다.");
+					continue;
+				}
+			}
+			System.out.println("프로그램을 종료 합니다");
+			System.out.println(String.format("%s님, 안녕히가세요.", findUsernameWithId()));
+			System.exit(0); // 정상적인 종료라고 0을 줌.
+		}
+	
 }//////////class

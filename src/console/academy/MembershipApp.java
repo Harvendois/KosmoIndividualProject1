@@ -10,6 +10,7 @@ public class MembershipApp {
 		MembershipLogic logic = new MembershipLogic();
 		//0. 로그인
 		logic.password(logic.login());
+		logic.welcome();
 		while(true) {
 		//1. 메인 메뉴 출력
 		logic.printMainMenu();

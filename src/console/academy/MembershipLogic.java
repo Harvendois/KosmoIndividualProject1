@@ -30,25 +30,34 @@ public class MembershipLogic extends MembershipImpl{
 
 	// [멤버메소드]
 
+	// 0-0] 환영 메소드
+	public void welcome() {
+		System.out.println(findUsernameWithId() + "님, 환영합니다");
+	}///////
+	
 	// 0-1] 메뉴 출력용 메소드
-
+	
 	public void printMainMenu() {
-		System.out.println("===================================메인 메뉴==================================");
-		System.out.println("1.입력 2. 출력 3.수정 4.삭제 5.검색 6.파일저장 7.ID/PW 출력 8.현재 사용되는 Id 조회 9.종료");
-		System.out.println("============================================================================");
-		System.out.println("=============================메인 메뉴 번호를 입력하세요?==========================");
+		System.out.println("=========================================메인 메뉴========================================");
+		System.out.println("1.입력 2. 출력 3.수정 4.삭제 5.검색 6.파일저장 7. CSV 파일로 입력 8.CSV 파일로 출력 9.종료 10.ID/PW 출력");
+		System.out.println("=======================================================================================");
+		System.out.println("===================================메인 메뉴 번호를 입력하세요?===============================");
 	}////////// printMainMenu()
 
 	// 0-2] 메뉴 번호 입력용 메소드
 	public int getMenuNumber() {
 		Scanner sc = new Scanner(System.in);
 		int menuStr = 0;
-		try {
-			menuStr = Integer.parseInt(getValue("메뉴 번호"));
-		} catch (NumberFormatException e) {
-			System.out.println("메뉴에는 숫자만 넣어주세요");
-			System.out.println("메뉴 번호를 입력하세요?");
-			getMenuNumber();
+		while(true) {
+			try {
+				menuStr = Integer.parseInt(getValue("메뉴 번호"));
+				break;
+			} 
+			catch (NumberFormatException e) {
+				System.out.println("메뉴에는 숫자만 넣어주세요");
+				System.out.println("메뉴 번호를 입력하세요?");
+				continue;
+			}
 		}
 		return menuStr;
 	}//////// getMenuNumber()
@@ -98,18 +107,27 @@ public class MembershipLogic extends MembershipImpl{
 				for (Object key : keys) {
 					List<Member> values = memberMap.get(key);
 					for (Member member : values) {
-						if(member.id.equals(userId)) {
-							while (true) {
-								System.out.println(String.format("정보 보흐를 위해 %s님은 본인의 정보만을 수정하실 수 있습니다.", findUsernameWithId()));
-								editSubMenu();
-								getSubMenu = getMenuNumber();
-								if (getSubMenu == 5)
-									break;
-								else if (!(getSubMenu == 1 | getSubMenu == 2 | getSubMenu == 3 | getSubMenu == 4 | getSubMenu == 5))
-									continue;
-								editMember(member, getSubMenu);
-							}
+						try {
+							if(member.id.equals(userId)) {
+								while (true) {
+									System.out.println(String.format("정보 보흐를 위해 %s님은 본인의 정보만을 수정하실 수 있습니다.", findUsernameWithId()));
+									editSubMenu();
+									getSubMenu = getMenuNumber();
+									if (getSubMenu == 5)
+										break;
+									else if (!(getSubMenu == 1 | getSubMenu == 2 | getSubMenu == 3 | getSubMenu == 4 | getSubMenu == 5))
+										continue;
+									editMember(member, getSubMenu);
+								}
+							}/////if
+						}
+						catch(NullPointerException e) {
 							
+						}
+						finally {
+							if(member.id==null) {
+								continue;
+							}
 						}
 					}
 					
@@ -119,6 +137,8 @@ public class MembershipLogic extends MembershipImpl{
 		case 4: // 삭제
 			if(isMember()) {
 				Member member = findWithName();
+				System.out.println("해당 멤버를 삭제합니다.");
+				printFoundName(member);
 				deleteMember(member);
 			}
 			else System.out.println("멤버 정보 보호를 위해 admin만이 입력/수정/삭제 할 수 있습니다.");
@@ -153,6 +173,22 @@ public class MembershipLogic extends MembershipImpl{
 			break;
 		case 7: 
 			if(isMember()) {
+				fileToMembers();
+			}
+			else {
+				System.out.println("멤버 정보 보호를 위해 admin만이 입력/수정/삭제 할 수 있습니다.");
+			}
+			break;
+		case 8: // 현재 아이디 확인
+			System.out.println("정보를 파일로 출력하시려면 비밀번호를 다시 입력하세요.");
+			password(userId);
+			membersToFile();
+			break;
+		case 9: // 종료
+			end();
+			break;
+		case 10:
+			if(isMember()) {
 				System.out.println("[ID와 PW들입니다.]");
 				Set keys = passwordMap.keySet();
 				for (Object key : keys) {
@@ -161,12 +197,6 @@ public class MembershipLogic extends MembershipImpl{
 				}
 			}
 			else System.out.println("멤버 정보 보호를 위해 admin만이 입력/수정/삭제 할 수 있습니다.");
-			break;
-		case 8: // 현재 아이디 확인
-			System.out.println("currently active ID is:"+userId);
-			break;
-		case 9: // 종료
-			end();
 			break;
 		default:
 			System.out.println("메뉴에 없는 번호입니다");
@@ -188,7 +218,7 @@ public class MembershipLogic extends MembershipImpl{
 		for (Object key : keys) {
 			List<Member> value = memberMap.get(key);
 			Collections.sort(value);
-			System.out.println(String.format("[%c에 해당하는 인원들]", key));
+			System.out.println(String.format("[%c에 해당하는 인원들: %d명]", key, value.size()));
 			for (Member member : value) {
 				member.print();
 			}
@@ -277,9 +307,10 @@ public class MembershipLogic extends MembershipImpl{
 		String deleteName = member.name;
 		char key = findKey(deleteName);
 		List<Member> list = memberMap.get(key);
+		char deleteChar = CommonUtil.getJaeum(member.name);
 		list.remove(member);
 		if(list.isEmpty()) {
-			//비게 될 Key, jaeum은 지워버리기
+			memberMap.remove(deleteChar);
 		}
 		System.out.println(String.format("%s 멤버의 정보가 삭제되었습니다", deleteName));
 	}//////////////////// deleteMember(int indexEdit)
@@ -300,7 +331,7 @@ public class MembershipLogic extends MembershipImpl{
 			name = receiveName();
 			char jaeum = findKey(name);
 			Member member = findMember(jaeum, name);
-			if(!(member==null)) {
+			if(!(member==null && member.name==null)) {
 				return member;
 			}
 			else {
@@ -320,6 +351,7 @@ public class MembershipLogic extends MembershipImpl{
 	private char findKey(String name) {
 		int index = 0;
 		char key = common.utility.CommonUtil.getJaeum(name);
+		
 		return key;
 	}////////////// findKey()
 
@@ -337,7 +369,6 @@ public class MembershipLogic extends MembershipImpl{
 		}
 		catch(NullPointerException e) {
 			System.out.println("검색하신 사람은 없는 멤버입니다.");
-			return null;
 		}
 		return memberSearched;
 	}////// findmember
@@ -394,11 +425,6 @@ public class MembershipLogic extends MembershipImpl{
 
 	
 
-	// 9] 종료 메소드
-	private void end() {
-		System.out.println("프로그램을 종료 합니다");
-		System.out.println(String.format("%s님, 안녕히가세요.", findUsernameWithId()));
-		System.exit(0); // 정상적인 종료라고 0을 줌.
-	}
+	
 
 }///////// class

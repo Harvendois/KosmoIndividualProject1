@@ -27,7 +27,7 @@ public class Member implements Comparable<Member>, Serializable{
 	}
 	//[멤버 메소드]
 	String get() {
-		return String.format("아이디:%-12s이름:%-2s, 나이:%s, 연락처:%s, 주소:%s",id, name,age,cont,addr);
+		return String.format("아이디:%-12s,이름:%-2s, 나이:%s, 연락처:%s, 주소:%s",id, name,age,cont,addr);
 	}
 	void print() {
 		System.out.println(get());
