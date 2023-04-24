@@ -32,7 +32,13 @@ public class MembershipLogic extends MembershipImpl{
 
 	// 0-0] 환영 메소드
 	public void welcome() {
+		if(userId.equalsIgnoreCase("admin")) {
+			System.out.println("관리자님, 환영합니다.");
+			System.out.println("현재 접속하신 프로그램은 CSV버전입니다.");
+		}
+		else {
 		System.out.println(findUsernameWithId() + "님, 환영합니다");
+		}
 	}///////
 	
 	// 0-1] 메뉴 출력용 메소드
@@ -55,7 +61,6 @@ public class MembershipLogic extends MembershipImpl{
 			} 
 			catch (NumberFormatException e) {
 				System.out.println("메뉴에는 숫자만 넣어주세요");
-				System.out.println("메뉴 번호를 입력하세요?");
 				continue;
 			}
 		}
@@ -343,7 +348,7 @@ public class MembershipLogic extends MembershipImpl{
 			catch(NullPointerException e) {
 				System.out.println("검색하신 사람은 없는 멤버입니다.");
 			}
-			if(!(memberSearched==null && memberSearched.name==null)) {
+			if(!(memberSearched==null || memberSearched.name==null)) {
 				return memberSearched;
 			}
 			else {
