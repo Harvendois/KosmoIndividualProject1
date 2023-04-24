@@ -303,7 +303,7 @@ public class MembershipImpl implements Membership {
 		Scanner sc = new Scanner(System.in);
 		String name;
 		while (true) {
-			name = getValue("이름");
+			name = getValue("찾으실/입력하실 이름");
 			if(common.utility.CommonUtil.isKorean(name)) {}
 			else {
 				System.out.println("주소는 영문/특수문자/오타 없이 입력해주세요.");
@@ -424,7 +424,7 @@ public class MembershipImpl implements Membership {
 		BufferedReader br = null;
 		try {
 			br = new BufferedReader(new InputStreamReader(new FileInputStream
-					("E:\\CJH\\Workspace\\Java\\ChoJungHaProject1\\src\\console\\academy\\"+getValue("파일이름.확장명")), "UTF-8"));
+					(getValue("절대경로/파일이름.확장명")), "UTF-8"));
 			System.out.println("스트림이 연결되었습니다.");
 			String line;
 			int i =0;
@@ -434,7 +434,7 @@ public class MembershipImpl implements Membership {
 				int age = Integer.parseInt(values[1]);
 				String address = values[2];
 	            String contact = values[3];
-	            Member newMember = new Member(null,name, age, address, contact);
+	            Member newMember = new Member("empty" ,name, age, address, contact);
 	            char key = common.utility.CommonUtil.getJaeum(name);
 	            Set keys = memberMap.keySet();
 	            if (keys.contains(key)) {
@@ -473,7 +473,7 @@ public class MembershipImpl implements Membership {
 		PrintWriter pw = null;
 		try {
 			pw = new PrintWriter(new FileWriter(
-					"E:\\CJH\\Workspace\\Java\\ChoJungHaProject1\\src\\console\\academy\\exported_members.csv"));
+					getValue("저장할 폴더로의 절대경로")+"\\exported_members.csv"));
 
 			System.out.println("스트림이 연결되었습니다.");
 			int i = 0;

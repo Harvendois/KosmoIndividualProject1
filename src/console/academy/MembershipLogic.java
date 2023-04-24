@@ -110,7 +110,7 @@ public class MembershipLogic extends MembershipImpl{
 						try {
 							if(member.id.equals(userId)) {
 								while (true) {
-									System.out.println(String.format("정보 보흐를 위해 %s님은 본인의 정보만을 수정하실 수 있습니다.", findUsernameWithId()));
+									System.out.println(String.format("정보 보호를 위해 %s님은 본인의 정보만을 수정하실 수 있습니다.", findUsernameWithId()));
 									editSubMenu();
 									getSubMenu = getMenuNumber();
 									if (getSubMenu == 5)
@@ -138,7 +138,6 @@ public class MembershipLogic extends MembershipImpl{
 			if(isMember()) {
 				Member member = findWithName();
 				System.out.println("해당 멤버를 삭제합니다.");
-				printFoundName(member);
 				deleteMember(member);
 			}
 			else System.out.println("멤버 정보 보호를 위해 admin만이 입력/수정/삭제 할 수 있습니다.");
@@ -259,7 +258,7 @@ public class MembershipLogic extends MembershipImpl{
 		Scanner sc = new Scanner(System.in);
 		
 		if (subMenuIndex == 1) {
-			String newName = getValue("수정하실 새로운 이름");
+			String newName = inputName();
 			char firstChar = CommonUtil.getJaeum(newName);
 			List<Member> listMember;
 			if (!memberMap.containsKey(firstChar)) {
@@ -305,7 +304,7 @@ public class MembershipLogic extends MembershipImpl{
 	// 4] 삭제 메소드
 	private void deleteMember(Member member) {
 		String deleteName = member.name;
-		char key = findKey(deleteName);
+		char key = common.utility.CommonUtil.getJaeum(deleteName);
 		List<Member> list = memberMap.get(key);
 		char deleteChar = CommonUtil.getJaeum(member.name);
 		list.remove(member);
@@ -328,11 +327,24 @@ public class MembershipLogic extends MembershipImpl{
 	public Member findWithName() {
 		String name;
 		while(true) {
-			name = receiveName();
-			char jaeum = findKey(name);
-			Member member = findMember(jaeum, name);
-			if(!(member==null && member.name==null)) {
-				return member;
+			name = inputName();
+			int index = 0;
+			char jaeum = common.utility.CommonUtil.getJaeum(name);
+			List<Member> list = memberMap.get(jaeum);
+			Member memberSearched = new Member();
+			try {
+				for (Member member : list) {
+					if (member.name.equals(name)) {
+						memberSearched = member;
+						break;
+					} /// if
+				} //// foreach
+			}
+			catch(NullPointerException e) {
+				System.out.println("검색하신 사람은 없는 멤버입니다.");
+			}
+			if(!(memberSearched==null && memberSearched.name==null)) {
+				return memberSearched;
 			}
 			else {
 				System.out.println("멤버를 다시 찾아주세요");
@@ -341,42 +353,11 @@ public class MembershipLogic extends MembershipImpl{
 		}////while
 	}/////findWithName
 
-	// 5-1-1] 이름을 받는 메소드
-	private String receiveName() {
-		String name = inputName();
-		return name;
-	}/////// receiveName()
-
-	// 5-1-2] Key를 찾는 메소드
-	private char findKey(String name) {
-		int index = 0;
-		char key = common.utility.CommonUtil.getJaeum(name);
-		
-		return key;
-	}////////////// findKey()
-
-	// 5-1-3] member을 찾는 메소드
-	public Member findMember(char key, String name) {
-		List<Member> list = memberMap.get(key);
-		Member memberSearched = new Member();
-		try {
-			for (Member member : list) {
-				if (member.name.equals(name)) {
-					memberSearched = member;
-					break;
-				} /// if
-			} //// foreach
-		}
-		catch(NullPointerException e) {
-			System.out.println("검색하신 사람은 없는 멤버입니다.");
-		}
-		return memberSearched;
-	}////// findmember
-
 	// 5-1-4] 이름으로 검색된 멤버를 출력하는 메소드
 	private void printFoundName(Member member) {
 		if (member.name==null) {
 			System.out.println("메인 메뉴로 돌아갑니다.");
+			return;
 		}
 		else {
 			System.out.println(String.format("[%s 멤버 정보]", member.name));
