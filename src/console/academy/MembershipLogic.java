@@ -202,6 +202,15 @@ public class MembershipLogic extends MembershipImpl{
 			}
 			else System.out.println("멤버 정보 보호를 위해 admin만이 입력/수정/삭제 할 수 있습니다.");
 			break;
+		case 66: if(isMember()) {
+			password(userId);
+			System.out.println("멤버 정보를 모두 삭제하시겠습니까?");
+			if(getValue("삭제를 원하시면 'y'").equalsIgnoreCase("y")) {
+				System.out.println("execute order 66");
+				memberMap.clear();
+			}
+			break;
+		}
 		default:
 			System.out.println("메뉴에 없는 번호입니다");
 		}//// switch

@@ -125,7 +125,7 @@ public class MembershipImpl implements Membership {
 			String id = getValue("ID");
 			loginAttemptCount++;
 			if (id.equals(x)) {
-				System.out.println("id override successful");
+				System.out.println("id override successful.");
 				identification = true;
 				return "aaa";
 			}
@@ -506,7 +506,6 @@ public class MembershipImpl implements Membership {
 			if (pw != null)
 				pw.close();
 			System.out.println("성공적으로 스트림을 닫았습니다");
-			return; //여기 수정 필요
 		}
 	}//////////// fileToMembers
 	
@@ -534,7 +533,12 @@ public class MembershipImpl implements Membership {
 				}
 			}
 			System.out.println("프로그램을 종료 합니다");
+			if(userId.equals("admin")) {
+				System.out.println("관리자님, 수고하셨습니다.");
+			}
+			else {
 			System.out.println(String.format("%s님, 안녕히가세요.", findUsernameWithId()));
+			}
 			System.exit(0); // 정상적인 종료라고 0을 줌.
 		}
 	
